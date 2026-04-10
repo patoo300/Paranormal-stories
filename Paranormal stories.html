@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paranormal Stories — Coming Soon</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .vhs {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+  .noise {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9;
+  }
+  .container {
+    text-align: center;
+    z-index: 20;
+    padding: 2rem;
+  }
+  .chapter {
+    font-size: 14px;
+    color: #e05555;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    animation: flicker 4s infinite;
+  }
+  .title {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: bold;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 2px 0 #e05555, -2px 0 #5555e0;
+    margin-bottom: 0.5rem;
+    animation: glitch 6s infinite;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: #888;
+    letter-spacing: 3px;
+    margin-bottom: 3rem;
+  }
+  .launching {
+    font-size: 13px;
+    color: #666;
+    letter-spacing: 3px;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+  .countdown {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+  .unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .number {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: bold;
+    color: #fff;
+    line-height: 1;
+    min-width: 80px;
+    text-align: center;
+    animation: flicker 8s infinite;
+  }
+  .label {
+    font-size: 11px;
+    color: #555;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .separator {
+    font-size: 3rem;
+    color: #333;
+    align-self: flex-start;
+    margin-top: 0.2rem;
+  }
+  .itch-btn {
+    display: inline-block;
+    border: 1px solid #e05555;
+    color: #e05555;
+    padding: 0.8rem 2.5rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-bottom: 2rem;
+  }
+  .itch-btn:hover {
+    background: #e05555;
+    color: #000;
+  }
+  .dev {
+    font-size: 11px;
+    color: #333;
+    letter-spacing: 2px;
+  }
+  .launched {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: #e05555;
+    letter-spacing: 4px;
+    animation: flicker 2s infinite;
+    display: none;
+    margin-bottom: 2rem;
+  }
+  @keyframes glitch {
+    0%, 90%, 100% { text-shadow: 2px 0 #e05555, -2px 0 #5555e0; }
+    92% { text-shadow: -3px 0 #e05555, 3px 0 #5555e0; transform: translateX(2px); }
+    94% { text-shadow: 3px 0 #5555e0, -3px 0 #e05555; transform: translateX(-2px); }
+    96% { text-shadow: 2px 0 #e05555, -2px 0 #5555e0; transform: translateX(0); }
+  }
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.6; }
+    97% { opacity: 1; }
+    98% { opacity: 0.4; }
+    99% { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="vhs"></div>
+<canvas class="noise" id="noise"></canvas>
+<div class="container">
+  <p class="chapter">Chapter 1</p>
+  <h1 class="title">Paranormal Stories</h1>
+  <p class="subtitle">The Beginning</p>
+  <p class="launching">Launching in</p>
+  <div class="countdown" id="countdown">
+    <div class="unit">
+      <span class="number" id="hours">00</span>
+      <span class="label">Hours</span>
+    </div>
+    <div class="separator">:</div>
+    <div class="unit">
+      <span class="number" id="minutes">00</span>
+      <span class="label">Minutes</span>
+    </div>
+    <div class="separator">:</div>
+    <div class="unit">
+      <span class="number" id="seconds">00</span>
+      <span class="label">Seconds</span>
+    </div>
+  </div>
+  <p class="launched" id="launched">— Now Available —</p>
+  <a href="https://zolvek.itch.io" class="itch-btn" target="_blank">Play on itch.io</a>
+  <p class="dev">A Zolvek game</p>
+</div>
+<script>
+  const canvas = document.getElementById('noise');
+  const ctx = canvas.getContext('2d');
+  function drawNoise() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const img = ctx.createImageData(canvas.width, canvas.height);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = Math.random() * 255;
+      img.data[i] = img.data[i+1] = img.data[i+2] = v;
+      img.data[i+3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+  setInterval(drawNoise, 100);
+
+  function getRemainingMs() {
+    const now = new Date();
+    const nowMadrid = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Madrid"}));
+    const target = new Date(nowMadrid);
+    target.setHours(18, 0, 0, 0);
+    if (nowMadrid >= target) target.setDate(target.getDate() + 1);
+    return target - nowMadrid;
+  }
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function update() {
+    const diff = getRemainingMs();
+    if (diff <= 0) {
+      document.getElementById('countdown').style.display = 'none';
+      document.querySelector('.launching').style.display = 'none';
+      document.getElementById('launched').style.display = 'block';
+      return;
+    }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('hours').textContent = pad(h);
+    document.getElementById('minutes').textContent = pad(m);
+    document.getElementById('seconds').textContent = pad(s);
+  }
+
+  update();
+  setInterval(update, 1000);
+</script>
+</body>
+</html>
